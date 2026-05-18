@@ -14,7 +14,7 @@ export async function saveImageToDisk(
   await ensureGeneratedDir();
   const filename = `${id}.png`;
   await fs.writeFile(path.join(GENERATED_DIR, filename), buffer);
-  return `/generated/${filename}`;
+  return `/api/images/${filename}`;
 }
 
 export async function deleteImageFromDisk(imageUrl: string): Promise<void> {
