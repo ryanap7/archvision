@@ -19,7 +19,8 @@ export async function saveImageToDisk(
 
 export async function deleteImageFromDisk(imageUrl: string): Promise<void> {
   try {
-    await fs.unlink(path.join(GENERATED_DIR, path.basename(imageUrl)));
+    const filename = path.basename(imageUrl);
+    await fs.unlink(path.join(GENERATED_DIR, filename));
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
       console.error("[Storage] Failed to delete image:", err);
