@@ -1,0 +1,25 @@
+# Next.js
+.next/
+out/
+build/
+
+# Node
+node_modules/
+
+# Generated content (persisted on server, not in git)
+/public/generated/*.png
+/public/generated/*.jpg
+/public/generated/*.webp
+/data/gallery.json
+
+# Env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
