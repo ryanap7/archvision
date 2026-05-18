@@ -1,33 +1,21 @@
-import fs from "fs";
-import { NextRequest, NextResponse } from "next/server";
-import path from "path";
+import { errorResponse, successResponse } from "@/lib/api";
+import { db } from "@/lib/db";
+import { deleteImageFromDisk } from "@/lib/storage";
+import { NextRequest } from "next/server";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ filename: string }> },
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { filename } = await params;
+  const { id } = await params;
 
-  if (
-    !filename.endsWith(".png") ||
-    filename.includes("..") ||
-    filename.includes("/")
-  ) {
-    return new NextResponse("Not found", { status: 404 });
+  const image = db.getImageById(id);
+  if (!image) {
+    return errorResponse(req, "NOT_FOUND", "Image not found", 404);
   }
 
-  const filepath = path.join(process.cwd(), "public", "generated", filename);
+  await deleteImageFromDisk(image.imageUrl);
+  db.deleteImage(id);
 
-  if (!fs.existsSync(filepath)) {
-    return new NextResponse("Not found", { status: 404 });
-  }
-
-  const buffer = fs.readFileSync(filepath);
-
-  return new NextResponse(buffer, {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=31536000, immutable",
-    },
-  });
+  return successResponse({ id }, "Image deleted successfully");
 }
