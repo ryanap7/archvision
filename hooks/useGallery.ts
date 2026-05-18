@@ -12,6 +12,20 @@ interface UseGalleryReturn {
   removeImage: (id: string) => Promise<void>;
 }
 
+function parseNetworkError(err: unknown): string {
+  if (!(err instanceof Error)) return "Failed to load gallery.";
+
+  if (
+    err.message.includes("Failed to fetch") ||
+    err.message.includes("NetworkError") ||
+    err.message.includes("ERR_INTERNET_DISCONNECTED")
+  ) {
+    return "No internet connection. Gallery could not be loaded.";
+  }
+
+  return "Failed to load gallery. Please refresh the page.";
+}
+
 export function useGallery(): UseGalleryReturn {
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +44,7 @@ export function useGallery(): UseGalleryReturn {
       setImages(data.data);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      setError(err instanceof Error ? err.message : "Failed to load gallery");
+      setError(parseNetworkError(err));
     } finally {
       setIsLoading(false);
     }

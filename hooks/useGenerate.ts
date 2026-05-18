@@ -16,6 +16,29 @@ interface UseGenerateReturn {
   reset: () => void;
 }
 
+function parseNetworkError(err: unknown): string {
+  if (!(err instanceof Error)) return "An unexpected error occurred.";
+
+  if (
+    err.message.includes("Failed to fetch") ||
+    err.message.includes("NetworkError") ||
+    err.message.includes("ERR_INTERNET_DISCONNECTED") ||
+    err.message.includes("ERR_NETWORK")
+  ) {
+    return "No internet connection. Please check your network and try again.";
+  }
+
+  if (err.message.includes("ERR_CONNECTION_REFUSED")) {
+    return "Cannot reach the server. Please try again in a moment.";
+  }
+
+  if (err.message.includes("timeout") || err.message.includes("AbortError")) {
+    return "Request timed out. Please try again.";
+  }
+
+  return err.message;
+}
+
 export function useGenerate(): UseGenerateReturn {
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +69,7 @@ export function useGenerate(): UseGenerateReturn {
         setStatus("success");
         return data.data;
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Network error. Check your connection.",
-        );
+        setError(parseNetworkError(err));
         setStatus("error");
         return null;
       }
