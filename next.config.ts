@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [],
   },
-  // Allow larger response body for image generation
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",
